@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Festa Junina 27/06</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="flag-line" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="hero-content">
+          <p class="kicker">Arraiá confirmado</p>
+          <h1 id="page-title">Festa Junina 27/06</h1>
+          <h2>Sítio Paulo Barbosa</h2>
+          <p>
+            Ocê tá convidado para aproveitar com a gente esse arraiá pra lá de bão!
+            Escolha abaixo o que ocê quer levar para fazermos aquela festança boa!
+          </p>
+        </div>
+      </section>
+
+      <section class="layout" aria-label="Escolhas para a festa">
+        <form class="guest-panel" id="party-form">
+          <div class="section-heading">
+            <p class="eyebrow">Sua contribuição</p>
+            <h2>O que ocê vai levar?</h2>
+          </div>
+
+          <label class="field">
+            <span>Seu nome</span>
+            <input id="guest-name" name="guestName" type="text" placeholder="Ex.: Maria" required />
+          </label>
+
+          <fieldset class="food-list">
+            <legend>Comidas</legend>
+            <div class="items-grid" id="items-grid"></div>
+          </fieldset>
+
+          <label class="field other-field" id="other-wrapper" hidden>
+            <span>Qual outro item?</span>
+            <input id="other-text" name="otherText" type="text" placeholder="Escreva o que vai levar" />
+          </label>
+
+          <p class="message" id="form-message" role="status"></p>
+
+          <div class="actions">
+            <button class="primary-button" type="submit">Confirmar escolha</button>
+            <button class="secondary-button" type="button" id="reset-form">Limpar</button>
+          </div>
+        </form>
+
+      </section>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
