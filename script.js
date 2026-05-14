@@ -181,7 +181,14 @@ function updateSelection(food, change) {
   const current = state.selections[food.name];
   const remaining = getRemaining(food);
   const limit = food.isOther ? 99 : remaining;
-  state.selections[food.name] = Math.max(0, Math.min(current + change, limit));
+
+  if (change > 0) {
+    foods.forEach((entry) => {
+      state.selections[entry.name] = 0;
+    });
+  }
+
+  state.selections[food.name] = Math.max(0, Math.min(current + change, limit, 1));
   renderFoodCards();
 }
 
@@ -229,6 +236,11 @@ async function handleSubmit(event) {
 
   if (Object.keys(items).length === 0) {
     showMessage("Escolha pelo menos uma comida.", "error");
+    return;
+  }
+
+  if (Object.values(items).reduce((sum, quantity) => sum + quantity, 0) > 1) {
+    showMessage("Cada pessoa/casal pode escolher apenas um item.", "error");
     return;
   }
 
