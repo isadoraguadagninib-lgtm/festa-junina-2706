@@ -97,11 +97,18 @@ h1 {
   font-size: clamp(1.2rem, 3vw, 2rem);
 }
 
-.hero p:last-child {
+.hero-copy {
   max-width: 680px;
-  margin-bottom: 0;
+}
+
+.hero-copy p {
+  margin-bottom: 10px;
   font-size: 1.08rem;
   line-height: 1.55;
+}
+
+.hero-copy p:last-child {
+  margin-bottom: 0;
 }
 
 .flag-line {
