@@ -432,7 +432,7 @@ button {
 
 @media (max-width: 680px) {
   .page-shell {
-    width: min(100% - 20px, 1180px);
+    width: min(100% - 12px, 1180px);
     padding-top: 10px;
   }
 
@@ -454,19 +454,57 @@ button {
   }
 
   .items-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
 
   .guest-panel,
   .summary-panel {
-    padding: 18px;
+    padding: 14px;
   }
 
   .food-card {
     grid-template-columns: 1fr;
+    gap: 10px;
+    min-height: 132px;
+    padding: 10px;
+    align-content: space-between;
+  }
+
+  .food-name {
+    margin-bottom: 4px;
+    font-size: 0.92rem;
+    line-height: 1.2;
+  }
+
+  .food-meta {
+    font-size: 0.78rem;
+    line-height: 1.25;
   }
 
   .quantity-control {
-    width: 120px;
+    grid-template-columns: 34px 36px 34px;
+    width: 106px;
+  }
+
+  .quantity-control button,
+  .quantity-control output {
+    height: 36px;
+  }
+
+  .quantity-control button {
+    width: 34px;
+  }
+
+  .quantity-control output {
+    min-width: 36px;
+  }
+
+  input {
+    min-height: 42px;
+  }
+
+  .section-heading h2 {
+    font-size: 1.35rem;
   }
 }
