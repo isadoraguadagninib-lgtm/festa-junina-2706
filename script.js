@@ -113,6 +113,18 @@ function readPixProof() {
     return Promise.resolve(null);
   }
 
+  if (file.type.startsWith("image/")) {
+    return readCompressedImage(file);
+  }
+
+  if (file.size > 3 * 1024 * 1024) {
+    return Promise.reject(new Error("Arquivo muito grande."));
+  }
+
+  return readFileAsPayload(file);
+}
+
+function readFileAsPayload(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -124,6 +136,43 @@ function readPixProof() {
         base64
       });
     };
+    reader.onerror = () => reject(new Error("Não consegui ler o comprovante."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function readCompressedImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const image = new Image();
+
+      image.onload = () => {
+        const maxSide = 1200;
+        const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(image.width * scale);
+        canvas.height = Math.round(image.height * scale);
+
+        const context = canvas.getContext("2d");
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.72);
+        const [, base64 = ""] = dataUrl.split(",");
+        const cleanName = file.name.replace(/\.[^.]+$/, "");
+
+        resolve({
+          name: `${cleanName}.jpg`,
+          type: "image/jpeg",
+          base64
+        });
+      };
+
+      image.onerror = () => reject(new Error("Não consegui preparar a imagem."));
+      image.src = String(reader.result);
+    };
+
     reader.onerror = () => reject(new Error("Não consegui ler o comprovante."));
     reader.readAsDataURL(file);
   });
@@ -300,7 +349,7 @@ function showMessage(text, type = "success") {
 function setSubmitting(isSubmitting) {
   state.isSubmitting = isSubmitting;
   submitButton.disabled = isSubmitting;
-  submitButton.textContent = isSubmitting ? "Confirmando..." : "Confirmar escolha";
+  submitButton.textContent = isSubmitting ? "Enviando..." : "Confirmar escolha";
   renderFoodCards();
 }
 
@@ -327,6 +376,11 @@ async function handleSubmit(event) {
 
   if (!pixProof.files[0]) {
     showMessage("Anexe o comprovante do pix.", "error");
+    return;
+  }
+
+  if (!pixProof.files[0].type.startsWith("image/") && pixProof.files[0].size > 3 * 1024 * 1024) {
+    showMessage("Envie um PDF de até 3 MB ou uma imagem do comprovante.", "error");
     return;
   }
 
