@@ -37,18 +37,8 @@
           </div>
 
           <label class="field">
-            <span>Seu nome / do casal</span>
-            <input id="guest-name" name="guestName" type="text" placeholder="Ex.: Maria e João" required />
-          </label>
-
-          <label class="field">
-            <span>Nome das pessoas que estarão presentes</span>
-            <textarea
-              id="people-names"
-              name="peopleNames"
-              placeholder="Ex.: Maria, João e Ana"
-              required
-            ></textarea>
+            <span>Seu nome</span>
+            <input id="guest-name" name="guestName" type="text" placeholder="Ex.: Maria" required />
           </label>
 
           <fieldset class="food-list">
@@ -61,10 +51,27 @@
             <input id="other-text" name="otherText" type="text" placeholder="Escreva o que vai levar" />
           </label>
 
-          <label class="field">
-            <span>Comprovante do pix (R$35,00 por pessoa)</span>
-            <input id="pix-proof" name="pixProof" type="file" accept="image/*,.pdf" required />
-          </label>
+          <div class="payment-section">
+            <div class="section-heading compact">
+              <p class="eyebrow">Pix</p>
+              <h2>R$35,00 por pessoa</h2>
+            </div>
+
+            <label class="field">
+              <span>Participantes incluídos no Pix</span>
+              <textarea
+                id="people-names"
+                name="peopleNames"
+                placeholder="Ex.: Maria, João e Ana"
+                required
+              ></textarea>
+            </label>
+
+            <label class="field">
+              <span>Comprovante do Pix</span>
+              <input id="pix-proof" name="pixProof" type="file" accept="image/*,.pdf" required />
+            </label>
+          </div>
 
           <p class="message" id="form-message" role="status"></p>
 
