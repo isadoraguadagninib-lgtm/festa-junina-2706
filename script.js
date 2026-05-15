@@ -164,6 +164,26 @@ async function refreshTotalsQuietly() {
   }
 }
 
+function wait(milliseconds) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, milliseconds);
+  });
+}
+
+async function confirmTotalsUpdated(previousTotals, selectedItems) {
+  await wait(900);
+  const response = await requestAppsScript("totals");
+
+  if (!response?.ok || !response.totals) {
+    return false;
+  }
+
+  state.totals = response.totals;
+  return Object.entries(selectedItems).every(([itemName, quantity]) => {
+    return (state.totals[itemName] || 0) >= (previousTotals[itemName] || 0) + quantity;
+  });
+}
+
 function getLocalTotals() {
   return state.registrations.reduce((totals, registration) => {
     Object.entries(registration.items).forEach(([itemName, quantity]) => {
@@ -356,13 +376,19 @@ async function handleSubmit(event) {
   };
 
   try {
+    const previousTotals = { ...state.totals };
     await submitRegistration(registration);
 
     if (CONFIG.appsScriptUrl) {
-      Object.entries(limitedItems).forEach(([itemName, quantity]) => {
-        state.totals[itemName] = (state.totals[itemName] || 0) + quantity;
-      });
-      refreshTotalsQuietly();
+      const confirmed = await confirmTotalsUpdated(previousTotals, limitedItems);
+
+      if (!confirmed) {
+        showMessage(
+          "Não consegui salvar na planilha. Confira a implantação do Apps Script e tente novamente.",
+          "error"
+        );
+        return;
+      }
     }
 
     form.reset();
