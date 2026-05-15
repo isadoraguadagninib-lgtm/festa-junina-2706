@@ -36,6 +36,8 @@ const itemsGrid = document.querySelector("#items-grid");
 const formMessage = document.querySelector("#form-message");
 const otherWrapper = document.querySelector("#other-wrapper");
 const otherText = document.querySelector("#other-text");
+const peopleNames = document.querySelector("#people-names");
+const pixProof = document.querySelector("#pix-proof");
 const submitButton = form.querySelector("button[type='submit']");
 
 function loadLocalRegistrations() {
@@ -102,6 +104,52 @@ async function loadRemoteRegistrations() {
   } catch {
     showMessage("Não consegui atualizar as vagas agora. Ocê ainda pode responder.", "error");
   }
+}
+
+function readPixProof() {
+  const file = pixProof.files[0];
+
+  if (!file) {
+    return Promise.resolve(null);
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result);
+      const [, base64 = ""] = result.split(",");
+      resolve({
+        name: file.name,
+        type: file.type || "application/octet-stream",
+        base64
+      });
+    };
+    reader.onerror = () => reject(new Error("Não consegui ler o comprovante."));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function submitRegistration(registration) {
+  if (!CONFIG.appsScriptUrl) {
+    state.registrations.push(registration);
+    saveLocalRegistrations();
+    state.totals = getLocalTotals();
+    return true;
+  }
+
+  await fetch(CONFIG.appsScriptUrl, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify({
+      action: "submit",
+      payload: registration
+    })
+  });
+
+  return true;
 }
 
 function getLocalTotals() {
@@ -227,6 +275,7 @@ function setSubmitting(isSubmitting) {
 async function handleSubmit(event) {
   event.preventDefault();
   const guestName = document.querySelector("#guest-name").value.trim();
+  const presentPeople = peopleNames.value.trim();
   const items = getChosenItems();
 
   if (!guestName) {
@@ -236,6 +285,16 @@ async function handleSubmit(event) {
 
   if (Object.keys(items).length === 0) {
     showMessage("Escolha pelo menos uma comida.", "error");
+    return;
+  }
+
+  if (!presentPeople) {
+    showMessage("Preencha o nome das pessoas que estarão presentes.", "error");
+    return;
+  }
+
+  if (!pixProof.files[0]) {
+    showMessage("Anexe o comprovante do pix.", "error");
     return;
   }
 
@@ -263,29 +322,45 @@ async function handleSubmit(event) {
     limitedItems[foodName] = quantity;
   }
 
+  setSubmitting(true);
+
+  let receipt;
+  try {
+    receipt = await readPixProof();
+  } catch {
+    showMessage("Não consegui ler o comprovante. Tente anexar novamente.", "error");
+    setSubmitting(false);
+    return;
+  }
+
   const registration = {
     id: crypto.randomUUID(),
     guestName,
+    peopleNames: presentPeople,
     otherFood: otherText.value.trim(),
+    pixProof: receipt,
     items: limitedItems,
     createdAt: new Date().toISOString()
   };
 
-  setSubmitting(true);
-
   try {
+    const previousTotals = { ...state.totals };
+    await submitRegistration(registration);
+
     if (CONFIG.appsScriptUrl) {
-      const response = await requestAppsScript("submit", registration);
-      if (!response?.ok) {
-        showMessage(response?.message || "Não consegui confirmar essa escolha agora.", "error");
-        return;
+      const response = await requestAppsScript("totals");
+      if (response?.ok && response.totals) {
+        state.totals = response.totals;
       }
 
-      state.totals = response.totals || {};
-    } else {
-      state.registrations.push(registration);
-      saveLocalRegistrations();
-      state.totals = getLocalTotals();
+      const confirmed = Object.entries(limitedItems).every(([itemName, quantity]) => {
+        return (state.totals[itemName] || 0) >= (previousTotals[itemName] || 0) + quantity;
+      });
+
+      if (!confirmed) {
+        showMessage("Não consegui confirmar na planilha. Tente novamente em instantes.", "error");
+        return;
+      }
     }
 
     form.reset();
