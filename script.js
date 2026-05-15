@@ -28,6 +28,7 @@ const state = {
   selections: Object.fromEntries(foods.map((food) => [food.name, 0])),
   registrations: loadLocalRegistrations(),
   totals: {},
+  totalsLoaded: !CONFIG.appsScriptUrl,
   isSubmitting: false
 };
 
@@ -93,6 +94,7 @@ function requestAppsScript(action, payload = {}) {
 async function loadRemoteRegistrations() {
   if (!CONFIG.appsScriptUrl) {
     state.totals = getLocalTotals();
+    state.totalsLoaded = true;
     return;
   }
 
@@ -100,10 +102,13 @@ async function loadRemoteRegistrations() {
     const response = await requestAppsScript("totals");
     if (response?.ok && response.totals) {
       state.totals = response.totals;
+      state.totalsLoaded = true;
       renderFoodCards();
     }
   } catch {
-    showMessage("Não consegui atualizar as vagas agora. Ocê ainda pode responder.", "error");
+    state.totalsLoaded = false;
+    renderFoodCards();
+    showMessage("Não consegui carregar as vagas da planilha. Atualize a página em instantes.", "error");
   }
 }
 
@@ -258,7 +263,9 @@ function renderFoodCards() {
 
     const meta = document.createElement("p");
     meta.className = "food-meta";
-    meta.textContent = food.isOther
+    meta.textContent = !state.totalsLoaded && !food.isOther
+      ? "Atualizando vagas..."
+      : food.isOther
       ? "Escreva abaixo o que vai levar"
       : `${remaining} de ${food.max} disponíveis`;
 
@@ -271,7 +278,7 @@ function renderFoodCards() {
     minus.type = "button";
     minus.textContent = "-";
     minus.ariaLabel = `Diminuir ${food.name}`;
-    minus.disabled = selected === 0 || state.isSubmitting;
+    minus.disabled = selected === 0 || state.isSubmitting || !state.totalsLoaded;
     minus.addEventListener("click", () => updateSelection(food, -1));
 
     const value = document.createElement("output");
@@ -282,7 +289,7 @@ function renderFoodCards() {
     plus.type = "button";
     plus.textContent = "+";
     plus.ariaLabel = `Aumentar ${food.name}`;
-    plus.disabled = state.isSubmitting || (!food.isOther && selected >= remaining);
+    plus.disabled = state.isSubmitting || !state.totalsLoaded || (!food.isOther && selected >= remaining);
     plus.addEventListener("click", () => updateSelection(food, 1));
 
     controls.append(minus, value, plus);
@@ -294,6 +301,11 @@ function renderFoodCards() {
 }
 
 function updateSelection(food, change) {
+  if (!state.totalsLoaded) {
+    showMessage("Aguarde carregar as vagas da planilha.", "error");
+    return;
+  }
+
   const current = state.selections[food.name];
   const remaining = getRemaining(food);
   const limit = food.isOther ? 99 : remaining;
@@ -333,7 +345,7 @@ function showMessage(text, type = "success") {
 
 function setSubmitting(isSubmitting) {
   state.isSubmitting = isSubmitting;
-  submitButton.disabled = isSubmitting;
+  submitButton.disabled = isSubmitting || !state.totalsLoaded;
   submitButton.textContent = isSubmitting ? "Enviando..." : "Confirmar escolha";
   renderFoodCards();
 }
@@ -350,6 +362,11 @@ async function handleSubmit(event) {
   const guestName = document.querySelector("#guest-name").value.trim();
   const presentPeople = peopleNames.value.trim();
   const items = getChosenItems();
+
+  if (!state.totalsLoaded) {
+    showMessage("Aguarde carregar as vagas da planilha antes de confirmar.", "error");
+    return;
+  }
 
   if (!guestName) {
     showMessage("Preencha seu nome para confirmar.", "error");
@@ -445,4 +462,5 @@ document.querySelector("#reset-form").addEventListener("click", () => {
 
 state.totals = getLocalTotals();
 renderFoodCards();
+submitButton.disabled = !state.totalsLoaded;
 loadRemoteRegistrations();
