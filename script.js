@@ -113,7 +113,7 @@ function readPixProof() {
     return Promise.resolve(null);
   }
 
-  if (file.type.startsWith("image/")) {
+  if (file.type.startsWith("image/") && file.size > 800 * 1024) {
     return readCompressedImage(file);
   }
 
@@ -149,7 +149,7 @@ function readCompressedImage(file) {
       const image = new Image();
 
       image.onload = () => {
-        const maxSide = 1200;
+        const maxSide = 900;
         const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
         const canvas = document.createElement("canvas");
         canvas.width = Math.round(image.width * scale);
@@ -158,7 +158,7 @@ function readCompressedImage(file) {
         const context = canvas.getContext("2d");
         context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.72);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.62);
         const [, base64 = ""] = dataUrl.split(",");
         const cleanName = file.name.replace(/\.[^.]+$/, "");
 
@@ -216,20 +216,6 @@ async function refreshTotalsQuietly() {
 function wait(milliseconds) {
   return new Promise((resolve) => {
     window.setTimeout(resolve, milliseconds);
-  });
-}
-
-async function confirmTotalsUpdated(previousTotals, selectedItems) {
-  await wait(900);
-  const response = await requestAppsScript("totals");
-
-  if (!response?.ok || !response.totals) {
-    return false;
-  }
-
-  state.totals = response.totals;
-  return Object.entries(selectedItems).every(([itemName, quantity]) => {
-    return (state.totals[itemName] || 0) >= (previousTotals[itemName] || 0) + quantity;
   });
 }
 
@@ -312,12 +298,10 @@ function updateSelection(food, change) {
   const limit = food.isOther ? 99 : remaining;
 
   if (change > 0) {
-    foods.forEach((entry) => {
-      state.selections[entry.name] = 0;
-    });
+    state.selections[food.name] = Math.max(0, Math.min(current + change, limit));
+  } else {
+    state.selections[food.name] = Math.max(0, Math.min(current + change, limit));
   }
-
-  state.selections[food.name] = Math.max(0, Math.min(current + change, limit, 1));
   renderFoodCards();
 }
 
@@ -384,11 +368,6 @@ async function handleSubmit(event) {
     return;
   }
 
-  if (Object.values(items).reduce((sum, quantity) => sum + quantity, 0) > 1) {
-    showMessage("Cada pessoa/casal pode escolher apenas um item.", "error");
-    return;
-  }
-
   if (items["Outro (avisar qual)"] && !otherText.value.trim()) {
     showMessage("Conte qual é o outro item que ocê vai levar.", "error");
     return;
@@ -430,19 +409,13 @@ async function handleSubmit(event) {
   };
 
   try {
-    const previousTotals = { ...state.totals };
     await submitRegistration(registration);
 
     if (CONFIG.appsScriptUrl) {
-      const confirmed = await confirmTotalsUpdated(previousTotals, limitedItems);
-
-      if (!confirmed) {
-        showMessage(
-          "Não consegui salvar na planilha. Confira a implantação do Apps Script e tente novamente.",
-          "error"
-        );
-        return;
-      }
+      Object.entries(limitedItems).forEach(([itemName, quantity]) => {
+        state.totals[itemName] = (state.totals[itemName] || 0) + quantity;
+      });
+      refreshTotalsQuietly();
     }
 
     form.reset();
