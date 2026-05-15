@@ -289,7 +289,7 @@ async function handleSubmit(event) {
   }
 
   if (!presentPeople) {
-    showMessage("Preencha o nome das pessoas que estarão presentes.", "error");
+    showMessage("Preencha os participantes incluídos no Pix.", "error");
     return;
   }
 
