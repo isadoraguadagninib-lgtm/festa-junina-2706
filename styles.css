@@ -199,12 +199,23 @@ h1 {
   font-size: 1.55rem;
 }
 
+.section-heading.compact h2 {
+  margin-bottom: 14px;
+  font-size: 1.25rem;
+}
+
 .field {
   display: grid;
   gap: 8px;
   margin-bottom: 18px;
   color: var(--muted);
   font-weight: 700;
+}
+
+.payment-section {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
 }
 
 input,
