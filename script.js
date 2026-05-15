@@ -152,6 +152,18 @@ async function submitRegistration(registration) {
   return true;
 }
 
+async function refreshTotalsQuietly() {
+  try {
+    const response = await requestAppsScript("totals");
+    if (response?.ok && response.totals) {
+      state.totals = response.totals;
+      renderFoodCards();
+    }
+  } catch {
+    // A confirmação do convidado não depende dessa atualização visual.
+  }
+}
+
 function getLocalTotals() {
   return state.registrations.reduce((totals, registration) => {
     Object.entries(registration.items).forEach(([itemName, quantity]) => {
@@ -344,23 +356,13 @@ async function handleSubmit(event) {
   };
 
   try {
-    const previousTotals = { ...state.totals };
     await submitRegistration(registration);
 
     if (CONFIG.appsScriptUrl) {
-      const response = await requestAppsScript("totals");
-      if (response?.ok && response.totals) {
-        state.totals = response.totals;
-      }
-
-      const confirmed = Object.entries(limitedItems).every(([itemName, quantity]) => {
-        return (state.totals[itemName] || 0) >= (previousTotals[itemName] || 0) + quantity;
+      Object.entries(limitedItems).forEach(([itemName, quantity]) => {
+        state.totals[itemName] = (state.totals[itemName] || 0) + quantity;
       });
-
-      if (!confirmed) {
-        showMessage("Não consegui confirmar na planilha. Tente novamente em instantes.", "error");
-        return;
-      }
+      refreshTotalsQuietly();
     }
 
     form.reset();
