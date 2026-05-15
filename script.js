@@ -39,6 +39,7 @@ const otherText = document.querySelector("#other-text");
 const peopleNames = document.querySelector("#people-names");
 const pixProof = document.querySelector("#pix-proof");
 const submitButton = form.querySelector("button[type='submit']");
+const thankYouScreen = document.querySelector("#thank-you-screen");
 
 function loadLocalRegistrations() {
   try {
@@ -337,6 +338,13 @@ function setSubmitting(isSubmitting) {
   renderFoodCards();
 }
 
+function showThankYouScreen() {
+  document.body.classList.add("is-confirmed");
+  document.querySelector(".page-shell").hidden = true;
+  thankYouScreen.hidden = false;
+  window.scrollTo(0, 0);
+}
+
 async function handleSubmit(event) {
   event.preventDefault();
   const guestName = document.querySelector("#guest-name").value.trim();
@@ -420,7 +428,7 @@ async function handleSubmit(event) {
 
     form.reset();
     resetSelections();
-    showMessage("Escolha confirmada. Obrigado por ajudar no arraiá!");
+    showThankYouScreen();
   } catch {
     showMessage("Não consegui enviar para a planilha agora. Tente de novo em instantes.", "error");
   } finally {
