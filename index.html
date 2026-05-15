@@ -37,8 +37,18 @@
           </div>
 
           <label class="field">
-            <span>Seu nome</span>
-            <input id="guest-name" name="guestName" type="text" placeholder="Ex.: Maria" required />
+            <span>Seu nome / do casal</span>
+            <input id="guest-name" name="guestName" type="text" placeholder="Ex.: Maria e João" required />
+          </label>
+
+          <label class="field">
+            <span>Nome das pessoas que estarão presentes</span>
+            <textarea
+              id="people-names"
+              name="peopleNames"
+              placeholder="Ex.: Maria, João e Ana"
+              required
+            ></textarea>
           </label>
 
           <fieldset class="food-list">
@@ -49,6 +59,11 @@
           <label class="field other-field" id="other-wrapper" hidden>
             <span>Qual outro item?</span>
             <input id="other-text" name="otherText" type="text" placeholder="Escreva o que vai levar" />
+          </label>
+
+          <label class="field">
+            <span>Comprovante do pix (R$35,00 por pessoa)</span>
+            <input id="pix-proof" name="pixProof" type="file" accept="image/*,.pdf" required />
           </label>
 
           <p class="message" id="form-message" role="status"></p>
