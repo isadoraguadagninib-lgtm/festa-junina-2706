@@ -265,6 +265,21 @@ h1 {
   border-top: 1px solid var(--border);
 }
 
+.pix-details {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+.pix-details p {
+  margin: 0;
+  line-height: 1.35;
+}
+
 input,
 textarea,
 select {
