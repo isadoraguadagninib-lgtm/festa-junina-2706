@@ -26,6 +26,10 @@ body {
     linear-gradient(135deg, #fff8e8 0%, #f7edd8 100%);
 }
 
+body.is-confirmed {
+  overflow: hidden;
+}
+
 button,
 input,
 textarea,
@@ -57,6 +61,49 @@ button {
   background-position: center;
   border-radius: 8px;
   box-shadow: var(--shadow);
+}
+
+.thank-you-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 24px;
+  background:
+    linear-gradient(rgba(46, 36, 24, 0.28), rgba(46, 36, 24, 0.72)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3E%3Crect width='1200' height='800' fill='%23eebd58'/%3E%3Cpath d='M0 493c145-64 280-72 410-18 116 48 238 52 366 12 156-50 292-42 424 16v297H0z' fill='%23247c5a'/%3E%3Cpath d='M0 556c150-44 286-43 410 2 116 42 241 45 379 8 151-41 288-34 411 20v214H0z' fill='%231b6549'/%3E%3Ccircle cx='980' cy='150' r='72' fill='%23fff2bc'/%3E%3Cpath d='M154 510h220v210H154z' fill='%23a94728'/%3E%3Cpath d='M112 510l152-124 152 124z' fill='%23763422'/%3E%3Cpath d='M230 590h68v130h-68z' fill='%233d2b20'/%3E%3Cpath d='M740 470h284v250H740z' fill='%23b8552f'/%3E%3Cpath d='M696 470l186-148 186 148z' fill='%23843c25'/%3E%3Cpath d='M844 570h78v150h-78z' fill='%233d2b20'/%3E%3Cpath d='M0 112c175 62 336 62 512 0s338-62 688 0' stroke='%23fff8e8' stroke-width='7' fill='none' opacity='.8'/%3E%3Cpath d='M0 190c175 62 336 62 512 0s338-62 688 0' stroke='%23763422' stroke-width='7' fill='none' opacity='.45'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: center;
+}
+
+.thank-you-screen[hidden] {
+  display: none;
+}
+
+.thank-you-content {
+  width: min(720px, 100%);
+  color: #fffdf6;
+  text-align: center;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+
+.thank-you-content .kicker {
+  color: #ffe799;
+}
+
+.thank-you-content h2 {
+  margin-bottom: 18px;
+  font-size: clamp(2.4rem, 8vw, 5.4rem);
+  line-height: 0.98;
+}
+
+.thank-you-content p:last-child {
+  margin: 0 auto;
+  max-width: 560px;
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  line-height: 1.45;
 }
 
 .hero-content {
