@@ -28,6 +28,7 @@ body {
 
 button,
 input,
+textarea,
 select {
   font: inherit;
 }
@@ -207,6 +208,7 @@ h1 {
 }
 
 input,
+textarea,
 select {
   width: 100%;
   min-height: 46px;
@@ -218,10 +220,17 @@ select {
 }
 
 input:focus,
+textarea:focus,
 select:focus,
 button:focus-visible {
   outline: 3px solid rgba(40, 116, 166, 0.25);
   outline-offset: 2px;
+}
+
+textarea {
+  min-height: 88px;
+  padding: 12px 14px;
+  resize: vertical;
 }
 
 fieldset {
