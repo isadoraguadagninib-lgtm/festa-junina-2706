@@ -2,25 +2,30 @@ const STORAGE_KEY = "festa-junina-2706-respostas";
 const CONFIG = window.FESTA_JUNINA_CONFIG || { appsScriptUrl: "" };
 
 const foods = [
-  { name: "Cachorro quente", max: 6 },
-  { name: "Milho", max: 4 },
-  { name: "Pamonha", max: 3 },
-  { name: "Coxinha", max: 6 },
-  { name: "Bolinha de queijo", max: 4 },
-  { name: "Empadinha", max: 4 },
-  { name: "Pipoca", max: 6 },
-  { name: "Pastel", max: 4 },
-  { name: "Mandioca", max: 3 },
+  { name: "Mini cachorro quente (mínimo 50 unidades)", max: 2 },
+  { name: "Milho", max: 0 },
+  { name: "Coxinha (mínimo 50 unidades)", max: 4 },
+  { name: "Bolinha de queijo (mínimo 50 unidades)", max: 4 },
+  { name: "Pipoca", max: 0 },
+  { name: "Pastelzinho (mínimo 50 unidades)", max: 4 },
+  { name: "Mini esfiha (mínimo 50 unidades)", max: 4 },
+  { name: "Mandioca", max: 0 },
   { name: "Torta salgada", max: 5 },
-  { name: "Mini sanduíches", max: 4 },
-  { name: "Cuscuz", max: 2 },
-  { name: "Arroz doce", max: 3 },
+  { name: "Mini sanduíches (mínimo 50 unidades)", max: 2 },
+  { name: "Cuscuz", max: 4 },
+  { name: "1kg de amendoim japonês", max: 1 },
+  { name: "1kg de amendoim torrado", max: 1 },
+  { name: "Arroz doce", max: 2 },
   { name: "Bolo de fubá", max: 4 },
   { name: "Bolo de milho", max: 4 },
-  { name: "Bolo de cenoura", max: 3 },
-  { name: "Paçoca / doce de leite / pé de moleque", max: 6 },
-  { name: "Quentão", max: 3 },
-  { name: "Vinho quente", max: 3 },
+  { name: "Doce de abóbora", max: 2 },
+  { name: "Doce de batata doce", max: 2 },
+  { name: "Mini churros (mínimo 50 unidades)", max: 2 },
+  { name: "Paçoca pote", max: 0 },
+  { name: "Doce de leite", max: 0 },
+  { name: "Pé de moleque/pé de moça", max: 0 },
+  { name: "Quentão 3L", max: 3 },
+  { name: "Vinho quente 3L", max: 3 },
   { name: "Outro (avisar qual)", max: 99, isOther: true }
 ];
 
@@ -254,7 +259,7 @@ function renderFoodCards() {
     const remaining = getRemaining(food);
     const selected = state.selections[food.name];
     const card = document.createElement("article");
-    card.className = `food-card${remaining === 0 && !food.isOther ? " is-complete" : ""}`;
+    card.className = `food-card${remaining === 0 && !food.isOther ? " is-complete is-unavailable" : ""}`;
 
     const info = document.createElement("div");
     const title = document.createElement("p");
@@ -267,6 +272,8 @@ function renderFoodCards() {
       ? "Atualizando vagas..."
       : food.isOther
       ? "Escreva abaixo o que vai levar"
+      : remaining === 0
+      ? "Sem disponibilidade"
       : `${remaining} de ${food.max} disponíveis`;
 
     info.append(title, meta);
@@ -404,7 +411,7 @@ async function handleSubmit(event) {
     const available = getRemaining(food);
 
     if (!food.isOther && quantity > available) {
-      showMessage(`${foodName} já passou do limite disponível. Ajustei a lista pra ocê.`, "error");
+      showMessage(`${foodName} não tem disponibilidade suficiente. Ajustei a lista pra ocê.`, "error");
       renderFoodCards();
       return;
     }
