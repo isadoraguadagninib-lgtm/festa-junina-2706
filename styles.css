@@ -259,6 +259,15 @@ h1 {
   font-weight: 700;
 }
 
+.field small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
 .payment-section {
   margin-top: 22px;
   padding-top: 20px;
@@ -338,6 +347,16 @@ legend {
 
 .food-card.is-complete {
   background: #f2ead7;
+}
+
+.food-card.is-unavailable {
+  border-color: rgba(199, 55, 47, 0.35);
+  background: #fff2ee;
+}
+
+.food-card.is-unavailable .food-name,
+.food-card.is-unavailable .food-meta {
+  color: var(--tomato);
 }
 
 .food-name {
