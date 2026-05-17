@@ -108,10 +108,17 @@ async function loadRemoteRegistrations() {
     if (response?.ok && response.totals) {
       state.totals = response.totals;
       state.totalsLoaded = true;
+      updateSubmitButtonState();
       renderFoodCards();
+    } else {
+      state.totalsLoaded = false;
+      updateSubmitButtonState();
+      renderFoodCards();
+      showMessage("Não consegui carregar as vagas da planilha. Atualize a página em instantes.", "error");
     }
   } catch {
     state.totalsLoaded = false;
+    updateSubmitButtonState();
     renderFoodCards();
     showMessage("Não consegui carregar as vagas da planilha. Atualize a página em instantes.", "error");
   }
@@ -350,10 +357,14 @@ function showMessage(text, type = "success") {
   formMessage.classList.toggle("error", type === "error");
 }
 
+function updateSubmitButtonState() {
+  submitButton.disabled = state.isSubmitting || !state.totalsLoaded;
+  submitButton.textContent = state.isSubmitting ? "Enviando..." : "Confirmar escolha";
+}
+
 function setSubmitting(isSubmitting) {
   state.isSubmitting = isSubmitting;
-  submitButton.disabled = isSubmitting || !state.totalsLoaded;
-  submitButton.textContent = isSubmitting ? "Enviando..." : "Confirmar escolha";
+  updateSubmitButtonState();
   renderFoodCards();
 }
 
@@ -469,5 +480,5 @@ document.querySelector("#reset-form").addEventListener("click", () => {
 
 state.totals = getLocalTotals();
 renderFoodCards();
-submitButton.disabled = !state.totalsLoaded;
+updateSubmitButtonState();
 loadRemoteRegistrations();
