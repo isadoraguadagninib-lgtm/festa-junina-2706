@@ -246,6 +246,13 @@ h1 {
   font-size: 1.55rem;
 }
 
+.section-note {
+  margin: -8px 0 18px;
+  color: var(--muted);
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
 .section-heading.compact h2 {
   margin-bottom: 14px;
   font-size: 1.25rem;
